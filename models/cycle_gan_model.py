@@ -96,6 +96,8 @@ class CycleGANModel(BaseModel):
 
             self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr=opt.lr, betas=(opt.beta1, 0.999))
             self.optimizer_D = torch.optim.RMSprop(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), lr=opt.lr)
+            self.optimizer_D_A = torch.optim.RMSprop(self.netD_A.parameters(), lr=opt.lr)
+            self.optimizer_D_B = torch.optim.RMSprop(self.netD_B.parameters(), lr=opt.lr)
 
             self.optimizers.append(self.optimizer_G)
             self.optimizers.append(self.optimizer_D)
@@ -229,9 +231,10 @@ class CycleGANModel(BaseModel):
 
     
     def optimize_parameters(self):
+        """Calculate losses, gradients, and update network weights; called in every training iteration"""
         self.forward()  # compute fake images and reconstruction images.
 
-        # Update D_A and D_B
+        # D_A and D_B
         self.set_requires_grad([self.netD_A, self.netD_B], True)
         self.optimizer_D_A.zero_grad()  # set D_A's gradients to zero
         self.optimizer_D_B.zero_grad()  # set D_B's gradients to zero
@@ -240,11 +243,11 @@ class CycleGANModel(BaseModel):
         self.optimizer_D_A.step()  # update D_A's weights
         self.optimizer_D_B.step()  # update D_B's weights
 
-        # Update G_A and G_B every fifth iteration
+        # G_A and G_B
+        self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
         if self.iter_count % 5 == 0:
-            self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
             self.optimizer_G.zero_grad()  # set G_A and G_B's gradients to zero
-            self.backward_G()  # calculate graidents for G_A and G_B
+            self.backward_G()  # calculate gradients for G_A and G_B
             self.optimizer_G.step()  # update G_A and G_B's weights
-
+        
         self.iter_count += 1
