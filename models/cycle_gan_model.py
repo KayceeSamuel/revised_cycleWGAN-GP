@@ -166,7 +166,7 @@ class CycleGANModel(BaseModel):
         loss_D = (loss_D_real + loss_D_fake) * 0.5
 
         # Calculate the gradient penalty
-        gradient_penalty, _ = networks.cal_gradient_penalty(netD, real, fake.detach(), device=self.device, type='mixed', constant=1.0, lambda_gp=10.0)
+        gradient_penalty, _ = networks.cal_gradient_penalty(netD, real, fake.detach(), device=self.device, type='mixed', constant=1.0, lambda_gp=self.opt.lambda_gp)
         loss_D += gradient_penalty
 
         loss_D.backward()
