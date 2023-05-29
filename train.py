@@ -49,7 +49,17 @@ if __name__ == '__main__':
             total_iters += opt.batch_size
             epoch_iter += opt.batch_size
             model.set_input(data)         # unpack data from dataset and apply preprocessing
+
+            print("Before step:", model.netG_A.layer_name.weight.data) # to test for parameter updates
+
             model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
+
+            print("After step:", model.netG_A.layer_name.weight.data) # to test for parameter updates
+
+            #debugging backwards pass of gradient log
+            for name, param in model.named_parameters():
+                if param.requires_grad:
+                    print(name, param.grad)
 
             if total_iters % opt.display_freq == 0:   # display images on visdom and save images to a HTML file
                 save_result = total_iters % opt.update_html_freq == 0
