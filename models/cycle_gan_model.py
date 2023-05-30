@@ -96,8 +96,8 @@ class CycleGANModel(BaseModel):
 
             self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr=opt.lr, betas=(opt.beta1, 0.999))
             self.optimizer_D = torch.optim.RMSprop(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), lr=opt.lr)
-            self.optimizer_D_A = torch.optim.RMSprop(self.netD_A.parameters(), lr=opt.lr)
-            self.optimizer_D_B = torch.optim.RMSprop(self.netD_B.parameters(), lr=opt.lr)
+            # self.optimizer_D_A = torch.optim.RMSprop(self.netD_A.parameters(), lr=opt.lr)
+            # self.optimizer_D_B = torch.optim.RMSprop(self.netD_B.parameters(), lr=opt.lr)
 
             self.optimizers.append(self.optimizer_G)
             self.optimizers.append(self.optimizer_D)
@@ -238,12 +238,14 @@ class CycleGANModel(BaseModel):
 
         # D_A and D_B
         self.set_requires_grad([self.netD_A, self.netD_B], True)
-        self.optimizer_D_A.zero_grad()  # set D_A's gradients to zero
-        self.optimizer_D_B.zero_grad()  # set D_B's gradients to zero
+        # self.optimizer_D_A.zero_grad()  # set D_A's gradients to zero
+        # self.optimizer_D_B.zero_grad()  # set D_B's gradients to zero
+        self.optimizer_D.zero_grad()
         self.backward_D_A()  # calculate gradients for D_A
         self.backward_D_B()  # calculate gradients for D_B
-        self.optimizer_D_A.step()  # update D_A's weights
-        self.optimizer_D_B.step()  # update D_B's weights
+        # self.optimizer_D_A.step()  # update D_A's weights
+        # self.optimizer_D_B.step()  # update D_B's weights
+        self.optimizer_D.step()
 
         # G_A and G_B
         self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
