@@ -50,11 +50,7 @@ if __name__ == '__main__':
             epoch_iter += opt.batch_size
             model.set_input(data)         # unpack data from dataset and apply preprocessing
 
-            print("Before step:", model.netG_A.layer_name.weight.data) # to test for parameter updates
-
             model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
-
-            print("After step:", model.netG_A.layer_name.weight.data) # to test for parameter updates
 
             #debugging backwards pass of gradient log
             for name, param in model.named_parameters():
