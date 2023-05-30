@@ -82,7 +82,7 @@ class Visualizer():
 
         if self.display_id > 0:  # connect to a visdom server given <display_port> and <display_server>
             import visdom
-            self.vis = visdom.Visdom(server=opt.display_server, port=opt.display_port, env=opt.display_env)
+            self.vis = visdom.Visdom(server=opt.display_server, port=opt.display_port, env=opt.display_env, use_incoming_socket=False)
             if not self.vis.check_connection():
                 self.create_visdom_connections()
 
