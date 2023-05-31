@@ -40,7 +40,7 @@ if __name__ == '__main__':
         iter_data_time = time.time()    # timer for data loading per iteration
         epoch_iter = 0                  # the number of training iterations in current epoch, reset to 0 every epoch
         visualizer.reset()              # reset the visualizer: make sure it saves the results to HTML at least once every epoch
-        model.update_learning_rate()    # update learning rates in the beginning of every epoch.
+        #model.update_learning_rate()    # update learning rates in the beginning of every epoch. removed to settle the Detected call of `lr_scheduler.step()` before `optimizer.step() error
         for i, data in enumerate(dataset):  # inner loop within one epoch
             iter_start_time = time.time()  # timer for computation per iteration
             if total_iters % opt.print_freq == 0:
@@ -51,18 +51,6 @@ if __name__ == '__main__':
             model.set_input(data)         # unpack data from dataset and apply preprocessing
             
             model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
-
-            #debugging backwards pass of gradient log
-            # for net_name in ['netG_A', 'netG_B', 'netD_A', 'netD_B']:
-            #     print(f"Gradients for {net_name}:")
-            #     # get the specific model
-            #     net = getattr(model, net_name)
-            #     # if the model exists and is not in eval mode (which means it's used and trainable)
-            #     if net and net.training:
-            #         # print gradients for all its parameters
-            #         for name, param in net.named_parameters():
-            #             if param.requires_grad:
-            #                 print(name, param.grad)
 
             if total_iters % opt.display_freq == 0:   # display images on visdom and save images to a HTML file
                 save_result = total_iters % opt.update_html_freq == 0
@@ -82,6 +70,9 @@ if __name__ == '__main__':
                 model.save_networks(save_suffix)
 
             iter_data_time = time.time()
+        
+        model.update_learning_rate()
+
         if epoch % opt.save_epoch_freq == 0:              # cache our model every <save_epoch_freq> epochs
             print('saving the model at the end of epoch %d, iters %d' % (epoch, total_iters))
             model.save_networks('latest')
